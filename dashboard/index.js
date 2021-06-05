@@ -227,7 +227,7 @@ const server = http.createServer( (req, res) => {
 	return dashboard(res, dashboardLang, themeCookie, sessionData.get(state), reqURL, action);
 } );
 
-server.listen( 8080, 'localhost', () => {
+server.listen( 8080, () => {
 	console.log( '- Dashboard: Server running at http://localhost:8080/' );
 } );
 

@@ -1,0 +1,27 @@
+version: "3.1"
+
+services:
+  app:
+    image: node:15
+    restart: always
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./:/opt
+      - /opt/node_modules
+      - /opt/data
+    links:
+      - db
+    command: bash -c "cd /opt && npm install && npm start"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_DB: ${PGDATABASE}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    expose:
+      - 5432
