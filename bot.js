@@ -42,9 +42,8 @@ const client = new Discord.Client( {
 	} : {
 		status: 'online',
 		activity: {
-			type: 'STREAMING',
-			name: process.env.prefix + 'help',
-			url: 'https://www.twitch.tv/wikibot'
+			type: 'PLAYING',
+			name: process.env.prefix + 'help'
 		}
 	} ),
 	ws: {

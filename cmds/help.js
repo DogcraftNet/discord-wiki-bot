@@ -15,7 +15,7 @@ const helpmap = {
 	command: ['minecraft.default', 'minecraft.command'],
 	bug: ['minecraft.bug'],
 	discussion: ['discussion.thread', 'discussion.post'],
-	info: ['info'],
+	//info: ['info'],
 	help: ['help.default', 'help.command', 'help.admin'],
 	settings: ['settings.default', 'settings.wiki', 'settings.lang', 'settings.role', 'settings.inline', 'settings.prefix', 'settings.channel'],
 	verify: ['verify'],
@@ -35,7 +35,7 @@ const helplist = {
 		'diff',
 		'minecraftHelp',
 		'discussion',
-		'info',
+		//'info',
 		'help',
 		'test'
 	],

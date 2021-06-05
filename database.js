@@ -8,18 +8,18 @@ db.on( 'error', dberror => {
 const schema = [`
 BEGIN TRANSACTION;
 
-CREATE TABLE patreons (
+CREATE TABLE IF NOT EXISTS patreons (
     patreon TEXT    PRIMARY KEY
                     UNIQUE
                     NOT NULL,
     count   INTEGER NOT NULL
 );
 
-CREATE INDEX idx_patreons_patreon ON patreons (
+CREATE INDEX IF NOT EXISTS idx_patreons_patreon ON patreons (
     patreon
 );
 
-CREATE TABLE discord (
+CREATE TABLE IF NOT EXISTS discord (
     main    TEXT    UNIQUE
                     CHECK (main = guild),
     guild   TEXT    NOT NULL
@@ -41,23 +41,23 @@ CREATE TABLE discord (
     )
 );
 
-CREATE INDEX idx_discord_channel ON discord (
+CREATE INDEX IF NOT EXISTS idx_discord_channel ON discord (
     guild,
     channel DESC
             NULLS LAST
 );
 
-CREATE INDEX idx_discord_patreon ON discord (
+CREATE INDEX IF NOT EXISTS idx_discord_patreon ON discord (
     patreon
 )
 WHERE patreon IS NOT NULL;
 
-CREATE INDEX idx_discord_voice ON discord (
+CREATE INDEX IF NOT EXISTS idx_discord_voice ON discord (
     voice
 )
 WHERE voice IS NOT NULL;
 
-CREATE TABLE verification (
+CREATE TABLE IF NOT EXISTS verification (
     guild      TEXT    NOT NULL
                        REFERENCES discord (main) ON DELETE CASCADE,
     configid   INTEGER NOT NULL,
@@ -78,13 +78,13 @@ CREATE TABLE verification (
     )
 );
 
-CREATE INDEX idx_verification_config ON verification (
+CREATE INDEX IF NOT EXISTS idx_verification_config ON verification (
     guild,
     configid ASC,
     channel
 );
 
-CREATE TABLE verifynotice (
+CREATE TABLE IF NOT EXISTS verifynotice (
     guild      TEXT    UNIQUE
                        NOT NULL
                        REFERENCES discord (main) ON DELETE CASCADE,
@@ -95,11 +95,11 @@ CREATE TABLE verifynotice (
                        DEFAULT 0
 );
 
-CREATE INDEX idx_verifynotice_guild ON verifynotice (
+CREATE INDEX IF NOT EXISTS idx_verifynotice_guild ON verifynotice (
     guild
 );
 
-CREATE TABLE rcgcdw (
+CREATE TABLE IF NOT EXISTS rcgcdw (
     guild    TEXT    NOT NULL
                      REFERENCES discord (main) ON DELETE CASCADE,
     configid INTEGER NOT NULL,
@@ -118,26 +118,26 @@ CREATE TABLE rcgcdw (
     )
 );
 
-CREATE INDEX idx_rcgcdw_wiki ON rcgcdw (
+CREATE INDEX IF NOT EXISTS idx_rcgcdw_wiki ON rcgcdw (
     wiki
 );
 
-CREATE INDEX idx_rcgcdw_webhook ON rcgcdw (
+CREATE INDEX IF NOT EXISTS idx_rcgcdw_webhook ON rcgcdw (
     webhook
 );
 
-CREATE INDEX idx_rcgcdw_config ON rcgcdw (
+CREATE INDEX IF NOT EXISTS idx_rcgcdw_config ON rcgcdw (
     guild,
     configid ASC
 );
 
-CREATE TABLE blocklist (
+CREATE TABLE IF NOT EXISTS blocklist (
     wiki   TEXT UNIQUE
                 NOT NULL,
     reason TEXT
 );
 
-CREATE INDEX idx_blocklist_wiki ON blocklist (
+CREATE INDEX IF NOT EXISTS idx_blocklist_wiki ON blocklist (
     wiki
 );
 
@@ -146,7 +146,7 @@ ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 1;
 `,`
 BEGIN TRANSACTION;
 
-CREATE TABLE verifynotice (
+CREATE TABLE IF NOT EXISTS verifynotice (
     guild      TEXT    UNIQUE
                        NOT NULL
                        REFERENCES discord (main) ON DELETE CASCADE,
@@ -155,7 +155,7 @@ CREATE TABLE verifynotice (
     onmatch    TEXT
 );
 
-CREATE INDEX idx_verifynotice_guild ON verifynotice (
+CREATE INDEX IF NOT EXISTS idx_verifynotice_guild ON verifynotice (
     guild
 );
 
@@ -165,7 +165,7 @@ ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 2;
 BEGIN TRANSACTION;
 
 ALTER TABLE verifynotice
-ADD COLUMN flags INTEGER NOT NULL DEFAULT 0;
+ADD COLUMN IF NOT EXISTS flags INTEGER NOT NULL DEFAULT 0;
 
 COMMIT TRANSACTION;
 ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 3;
