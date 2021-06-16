@@ -89,10 +89,42 @@ a[alt]:hover:after {
 }
 .scrollbar {
 	-ms-overflow-style: none;
-	scrollbar-width: none;
+	scrollbar-width: thin;
+	scrollbar-color: transparent transparent;
+}
+.scrollbar:hover {
+	scrollbar-color: #202225 transparent;
+}
+.theme-light .scrollbar:hover {
+	scrollbar-color: rgba(79,84,92,0.3) transparent;
 }
 .scrollbar::-webkit-scrollbar {
-	display: none;
+	width: 8px;
+	height: 8px;
+}
+.scrollbar::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
+.scrollbar::-webkit-scrollbar-thumb, .scrollbar::-webkit-scrollbar-track {
+	visibility: hidden;
+}
+.scrollbar:hover::-webkit-scrollbar-thumb, .scrollbar:hover::-webkit-scrollbar-track {
+	visibility: visible;
+}
+.scrollbar::-webkit-scrollbar-thumb {
+	background-clip: padding-box;
+	border: 2px solid transparent;
+	border-radius: 4px;
+	background-color: #202225;
+	min-height: 40px;
+}
+.theme-light .scrollbar::-webkit-scrollbar-thumb {
+	background-color: rgba(79,84,92,0.3);
+}
+.scrollbar::-webkit-scrollbar-track {
+	border-color: transparent;
+	background-color: transparent;
+	border: 2px solid transparent;
 }
 #sidebar {
 	position: fixed;
@@ -129,6 +161,7 @@ a[alt]:hover:after {
 	border-radius: 50%;
 	width: 48px;
 	height: 48px;
+	object-fit: cover;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -223,7 +256,7 @@ a[alt]:hover:after {
 }
 .channel {
 	padding: 3px 8px;
-	margin: 0 8px 2px 12px;
+	margin: 0 0 2px 12px;
 	min-height: 26px;
 	border-radius: 4px;
 	display: flex;
@@ -520,10 +553,13 @@ legend {
 fieldset > div {
 	margin: 10px 0;
 }
-fieldset label,
+fieldset label:not(.radio-label),
 fieldset span {
 	display: inline-block;
 	min-width: 20%;
+}
+fieldset label.radio-label {
+	padding-right: 5px;
 }
 fieldset label div {
 	padding-top: 30px;
@@ -548,10 +584,16 @@ fieldset textarea {
 	color: #2e3338;
 	background-color: #ebedef;
 }
+#wb-settings-avatar-preview-img {
+	width: 128px;
+	height: 128px;
+	background: #32353b;
+}
 .wb-settings-display:first-of-type,
 .wb-settings-permission:first-of-type {
 	display: inline-block;
 }
+#wb-settings-avatar-preview-img,
 .wb-settings-display:not(:first-of-type),
 .wb-settings-permission:not(:first-of-type),
 .wb-settings-additional-select,
