@@ -117,10 +117,10 @@
         "hidden": "*隱藏*",
         "info": {
             "added": "增加：",
-            "bytes": "$1位元$3",
+            "bytes": "$1位元",
             "comment": "摘要：",
             "editor": "編輯者：",
-            "minor": "（小）",
+            "minor": "_（小）",
             "more": "更多",
             "removed": "移除：",
             "size": "差異：",
@@ -397,7 +397,7 @@
             "perm_allow": "允許",
             "perm_default": "預設",
             "perm_deny": "拒絕",
-            "updated": "$1更新了`$2`的斜槓指令權限覆寫。"
+            "updated": "$1更新了`$2`的斜線指令權限覆寫。"
         },
         "inline": "請提供一些有 [[wikitext]] 的文字來使用此指令。",
         "nowiki": "所使用的wiki不存在！",
@@ -578,6 +578,7 @@
         "wiki": "wiki："
     },
     "search": {
+        "cached": "快取上次更新：",
         "category": {
             "content": "此分類的內容：",
             "empty": "*空白分類*",

@@ -99,6 +99,21 @@ CREATE INDEX IF NOT EXISTS idx_verifynotice_guild ON verifynotice (
     guild
 );
 
+CREATE TABLE IF NOT EXISTS oauthusers (
+    userid TEXT NOT NULL,
+    site   TEXT NOT NULL,
+    token  TEXT,
+    UNIQUE (
+        userid,
+        site
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_oauthusers_userid ON oauthusers (
+    userid,
+    site
+);
+
 CREATE TABLE IF NOT EXISTS rcgcdw (
     guild    TEXT    NOT NULL
                      REFERENCES discord (main) ON DELETE CASCADE,
@@ -142,14 +157,14 @@ CREATE INDEX IF NOT EXISTS idx_blocklist_wiki ON blocklist (
 );
 
 COMMIT TRANSACTION;
-ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 1;
+ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 4;
 `,`
 BEGIN TRANSACTION;
 
-CREATE TABLE IF NOT EXISTS verifynotice (
     guild      TEXT    UNIQUE
                        NOT NULL
                        REFERENCES discord (main) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS verifynotice (
     logchannel TEXT,
     onsuccess  TEXT,
     onmatch    TEXT
@@ -169,6 +184,26 @@ ADD COLUMN IF NOT EXISTS flags INTEGER NOT NULL DEFAULT 0;
 
 COMMIT TRANSACTION;
 ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 3;
+`,`
+BEGIN TRANSACTION;
+
+CREATE TABLE IF NOT EXISTS oauthusers (
+    userid TEXT NOT NULL,
+    site   TEXT NOT NULL,
+    token  TEXT,
+    UNIQUE (
+        userid,
+        site
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_oauthusers_userid ON oauthusers (
+    userid,
+    site
+);
+
+COMMIT TRANSACTION;
+ALTER DATABASE "${process.env.PGDATABASE}" SET my.version TO 4;
 `];
 
 module.exports = db.connect().then( () => {

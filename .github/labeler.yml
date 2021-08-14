@@ -1,4 +1,0 @@
-# Add 'translation' label to any change to i18n files
-translation:
-  - 'i18n/*.json'
-  - 'dashboard/i18n/*.json'

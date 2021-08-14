@@ -1,17 +1,37 @@
-const {Util} = require('discord.js');
+const {MessageEmbed, Util} = require('discord.js');
 const logging = require('../util/logging.js');
 const {timeoptions} = require('../util/default.json');
-const {toMarkdown, escapeFormatting} = require('../util/functions.js');
+const {got, toMarkdown, escapeFormatting} = require('../util/functions.js');
 
 const overwrites = {
-	randompage: (fn, lang, msg, wiki, reaction, spoiler) => {
-		fn.random(lang, msg, wiki, reaction, spoiler);
+	randompage: (fn, lang, msg, wiki, querystring, fragment, reaction, spoiler, noEmbed, args, embed, query) => {
+		let namespaces = Object.values(query.namespaces);
+		let contentNamespaces = namespaces.filter( ns => ns.content !== undefined );
+		let namespaceData = [contentNamespaces.map( ns => ns.id ).join('|'), contentNamespaces.map( ns => ( ns['*'] || '*' )  ).join(', ')];
+		if ( args[0] ) {
+			args[0] = args[0].replace( /_/g, ' ' ).toLowerCase().trim();
+			let namespaceMap = {};
+			namespaces.forEach( namespace => {
+				if ( namespace.id < 0 ) return;
+				if ( namespace.canonical ) namespaceMap[namespace.canonical.toLowerCase()] = namespace.id;
+				namespaceMap[namespace['*'].toLowerCase()] = namespace.id;
+			} );
+			query.namespacealiases.forEach( namespace => {
+				if ( namespace.id < 0 ) return;
+				namespaceMap[namespace['*'].toLowerCase()] = namespace.id;
+			} );
+			if ( namespaceMap.hasOwnProperty(args[0]) ) {
+				namespaceData = [namespaceMap[args[0]].toString(), ( namespaces.find( namespace => namespace.id === namespaceMap[args[0]] )?.['*'] || '*' )];
+			}
+			else if ( args[0] === '*' ) namespaceData = ['*', '*'];
+		}
+		fn.random(lang, msg, wiki, reaction, spoiler, noEmbed, namespaceData, querystring, fragment, embed);
 	},
-	statistics: (fn, lang, msg, wiki, reaction, spoiler) => {
-		fn.overview(lang, msg, wiki, reaction, spoiler);
+	statistics: (fn, lang, msg, wiki, querystring, fragment, reaction, spoiler, noEmbed) => {
+		fn.overview(lang, msg, wiki, reaction, spoiler, noEmbed, querystring, fragment);
 	},
-	diff: (fn, lang, msg, wiki, reaction, spoiler, args, embed) => {
-		fn.diff(lang, msg, args, wiki, reaction, spoiler, embed);
+	diff: (fn, lang, msg, wiki, querystring, fragment, reaction, spoiler, noEmbed, args, embed) => {
+		fn.diff(lang, msg, args, wiki, reaction, spoiler, noEmbed, embed);
 	}
 }
 
@@ -34,7 +54,7 @@ const queryfunctions = {
 	timestamp: (query, wiki, lang) => query.querypage.results.map( result => {
 		try {
 			var dateformat = new Intl.DateTimeFormat(lang.get('dateformat'), Object.assign({
-				timeZone: body.query.general.timezone
+				timeZone: query.general.timezone
 			}, timeoptions));
 		}
 		catch ( error ) {
@@ -42,7 +62,8 @@ const queryfunctions = {
 				timeZone: 'UTC'
 			}, timeoptions));
 		}
-		return dateformat.format(new Date(result.timestamp)) + ': [' + escapeFormatting(result.title) + '](' + wiki.toLink(result.title, '', '', true) + ')';
+		let lastEditDate = new Date(result.timestamp);
+		return dateformat.format(lastEditDate) + ' <t:' + Math.trunc(lastEditDate.getTime() / 1000) + ':R>: [' + escapeFormatting(result.title) + '](' + wiki.toLink(result.title, '', '', true) + ')';
 	} ).join('\n'),
 	media: (query, wiki, lang) => query.querypage.results.map( result => {
 		var ms = result.title.split(';');
@@ -107,6 +128,7 @@ const querypages = {
 }
 
 const descriptions = {
+	block: 'blockiptext&amargs=16|19',
 	checkuser: 'checkuser-summary&amargs=16|19',
 	resettokens: 'resettokens-text',
 	allmessages: 'allmessagestext',
@@ -129,42 +151,65 @@ const descriptions = {
  * @param {String} querypage.title - The title of the special page.
  * @param {String} querypage.uselang - The language of the special page.
  * @param {String} specialpage - The canonical name of the special page.
- * @param {import('discord.js').MessageEmbed} embed - The embed for the page.
+ * @param {Object} query - The siteinfo from the wiki.
  * @param {import('../util/wiki.js')} wiki - The wiki for the page.
+ * @param {URLSearchParams} querystring - The querystring for the link.
+ * @param {String} fragment - The section for the link.
  * @param {import('discord.js').MessageReaction} reaction - The reaction on the message.
  * @param {String} spoiler - If the response is in a spoiler.
+ * @param {Boolean} noEmbed - If the response should be without an embed.
  */
-function special_page(lang, msg, {title, uselang = lang.lang}, specialpage, embed, wiki, reaction, spoiler) {
+function special_page(lang, msg, {title, uselang = lang.lang}, specialpage, query, wiki, querystring, fragment, reaction, spoiler, noEmbed) {
+	var pagelink = wiki.toLink(title, querystring, fragment);
+	var embed = new MessageEmbed().setAuthor( query.general.sitename ).setTitle( escapeFormatting(title) ).setURL( pagelink ).setThumbnail( new URL(query.general.logo, wiki).href );
 	if ( overwrites.hasOwnProperty(specialpage) ) {
 		var args = title.split('/').slice(1,3);
-		overwrites[specialpage](this, lang, msg, wiki, reaction, spoiler, args, embed);
+		overwrites[specialpage](this, lang, msg, wiki, querystring, fragment, reaction, spoiler, noEmbed, args, embed, query);
 		return;
 	}
-	logging(wiki, msg.guild?.id, 'general', 'special');
-	if ( specialpage === 'recentchanges' && msg.isAdmin() ) {
-		embed.addField( lang.get('rcscript.title'), lang.get('rcscript.ad', ( patreons[msg?.guild?.id] || process.env.prefix ), '[RcGcDw](https://gitlab.com/piotrex43/RcGcDw)') );
+	logging(wiki, msg.guildId, 'general', 'special');
+	if ( !msg.showEmbed() || noEmbed ) {
+		msg.sendChannel( spoiler + '<' + pagelink + '>' + spoiler );
+		
+		if ( reaction ) reaction.removeEmoji();
+		return;
 	}
-	got.get( wiki + 'api.php?uselang=' + uselang + '&action=query&meta=allmessages|siteinfo&siprop=general&amenableparser=true&amtitle=' + encodeURIComponent( title ) + '&ammessages=' + ( descriptions.hasOwnProperty(specialpage) ? descriptions[specialpage] : encodeURIComponent( specialpage ) + '-summary' ) + ( querypages.hasOwnProperty(specialpage) ? querypages[specialpage][0] : '' ) + '&format=json' ).then( response => {
+	if ( specialpage === 'recentchanges' && msg.isAdmin() ) {
+		embed.addField( lang.get('rcscript.title'), lang.get('rcscript.ad', ( patreons[msg.guildId] || process.env.prefix ), '[RcGcDw](https://gitlab.com/piotrex43/RcGcDw)') );
+	}
+	got.get( wiki + 'api.php?uselang=' + uselang + '&action=query&meta=allmessages|siteinfo&siprop=general&amenableparser=true&amtitle=' + encodeURIComponent( title ) + '&ammessages=' + encodeURIComponent( specialpage ) + '|' + ( descriptions.hasOwnProperty(specialpage) ? descriptions[specialpage] : encodeURIComponent( specialpage ) + '-summary' ) + ( querypages.hasOwnProperty(specialpage) ? querypages[specialpage][0] : '' ) + '&converttitles=true&titles=%1F' + encodeURIComponent( title ) + '&format=json' ).then( response => {
 		var body = response.body;
 		if ( body && body.warnings ) log_warn(body.warnings);
 		if ( response.statusCode !== 200 || body?.batchcomplete === undefined ) {
 			console.log( '- ' + response.statusCode + ': Error while getting the special page: ' + ( body && body.error && body.error.info ) );
+			return;
 		}
-		else {
-			if ( body.query.allmessages[0]['*'] ) {
-				var description = toMarkdown(body.query.allmessages[0]['*'], wiki, title, true);
-				if ( description.length > 1000 ) description = description.substring(0, 1000) + '\u2026';
-				embed.setDescription( description );
-			}
-			if ( msg.channel.isGuild() && patreons[msg.guild?.id] && querypages.hasOwnProperty(specialpage) ) {
-				var text = Util.splitMessage( querypages[specialpage][1](body.query, wiki, lang), {maxLength:1000} )[0];
-				embed.addField( lang.get('search.special'), ( text || lang.get('search.empty') ) );
+		if ( body.query.pages?.['-1']?.title ) {
+			title = body.query.pages['-1'].title;
+			pagelink = wiki.toLink(title, querystring, fragment);
+			embed.setTitle( escapeFormatting(title) );
+		}
+		if ( body.query.allmessages?.[0]?.['*']?.trim?.() ) {
+			let displaytitle = escapeFormatting(body.query.allmessages[0]['*'].trim());
+			if ( displaytitle.length > 250 ) displaytitle = displaytitle.substring(0, 250) + '\u2026';
+			embed.setTitle( displaytitle );
+		}
+		if ( body.query.allmessages?.[1]?.['*']?.trim?.() ) {
+			var description = toMarkdown(body.query.allmessages[1]['*'], wiki, title, true);
+			if ( description.length > 1000 ) description = description.substring(0, 1000) + '\u2026';
+			embed.setDescription( description );
+		}
+		if ( msg.channel.isGuild() && patreons[msg.guildId] && querypages.hasOwnProperty(specialpage) ) {
+			var text = Util.splitMessage( querypages[specialpage][1](body.query, wiki, lang), {maxLength:1000} )[0];
+			embed.addField( lang.get('search.special'), ( text || lang.get('search.empty') ) );
+			if ( body.query.querypage.cached !== undefined ) {
+				embed.setFooter( lang.get('search.cached') ).setTimestamp(new Date(body.query.querypage.cachedtimestamp));
 			}
 		}
 	}, error => {
 		console.log( '- Error while getting the special page: ' + error );
 	} ).finally( () => {
-		msg.sendChannel( spoiler + '<' + embed.url + '>' + spoiler, {embed} );
+		msg.sendChannel( {content: spoiler + '<' + pagelink + '>' + spoiler, embeds: [embed]} );
 		
 		if ( reaction ) reaction.removeEmoji();
 	} );

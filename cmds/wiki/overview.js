@@ -1,7 +1,7 @@
 const {MessageEmbed} = require('discord.js');
 const logging = require('../../util/logging.js');
 const {timeoptions} = require('../../util/default.json');
-const {toFormatting, toPlaintext, escapeFormatting} = require('../../util/functions.js');
+const {got, toFormatting, toPlaintext, escapeFormatting} = require('../../util/functions.js');
 
 /**
  * Sends a Gamepedia wiki overview.
@@ -10,9 +10,13 @@ const {toFormatting, toPlaintext, escapeFormatting} = require('../../util/functi
  * @param {import('../../util/wiki.js')} wiki - The wiki for the overview.
  * @param {import('discord.js').MessageReaction} reaction - The reaction on the message.
  * @param {String} spoiler - If the response is in a spoiler.
+ * @param {Boolean} noEmbed - If the response should be without an embed.
+ * @param {URLSearchParams} [querystring] - The querystring for the link.
+ * @param {String} [fragment] - The section for the link.
  */
-function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
-	got.get( wiki + 'api.php?action=query&meta=siteinfo' + ( wiki.isFandom() ? '|allmessages&ammessages=custom-GamepediaNotice|custom-FandomMergeNotice&amenableparser=true' : '' ) + '&siprop=general|statistics|languages|rightsinfo' + ( wiki.isFandom() ? '|variables' : '' ) + '&siinlanguagecode=' + lang.lang + '&list=logevents&ledir=newer&lelimit=1&leprop=timestamp&titles=Special:Statistics&format=json' ).then( response => {
+function gamepedia_overview(lang, msg, wiki, reaction, spoiler, noEmbed, querystring = new URLSearchParams(), fragment = '') {
+	var uselang = ( querystring.getAll('variant').pop() || querystring.getAll('uselang').pop() || lang.lang );
+	got.get( wiki + 'api.php?uselang=' + uselang + '&action=query&meta=allmessages|siteinfo&amenableparser=true&amtitle=Special:Statistics&ammessages=statistics' + ( wiki.isFandom() ? '|custom-GamepediaNotice|custom-FandomMergeNotice' : '' ) + '&siprop=general|statistics|languages|rightsinfo' + ( wiki.isFandom() ? '|variables' : '' ) + '&siinlanguagecode=' + uselang + '&list=logevents&ledir=newer&lelimit=1&leprop=timestamp&titles=Special:Statistics&format=json' ).then( response => {
 		var body = response.body;
 		if ( body && body.warnings ) log_warn(body.warnings);
 		if ( response.statusCode !== 200 || !body || body.batchcomplete === undefined || !body.query || !body.query.pages ) {
@@ -22,17 +26,17 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 			}
 			else {
 				console.log( '- ' + response.statusCode + ': Error while getting the statistics: ' + ( body && body.error && body.error.info ) );
-				msg.sendChannelError( spoiler + '<' + wiki.toLink('Special:Statistics') + '>' + spoiler );
+				msg.sendChannelError( spoiler + '<' + wiki.toLink('Special:Statistics', querystring, fragment) + '>' + spoiler );
 			}
 			
 			if ( reaction ) reaction.removeEmoji();
 			return;
 		}
 		wiki.updateWiki(body.query.general);
-		logging(wiki, msg.guild?.id, 'overview');
+		logging(wiki, msg.guildId, 'overview');
 		var version = [lang.get('overview.version'), body.query.general.generator];
 		var creation_date = null;
-		var created = [lang.get('overview.created'), lang.get('overview.unknown')];
+		var created = [lang.get('overview.created'), lang.get('overview.unknown'), ''];
 		try {
 			var dateformat = new Intl.DateTimeFormat(lang.get('dateformat'), Object.assign({
 				timeZone: body.query.general.timezone
@@ -46,6 +50,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 		if ( body.query.logevents?.[0]?.timestamp ) {
 			creation_date = new Date(body.query.logevents[0].timestamp);
 			created[1] = dateformat.format(creation_date);
+			created[2] = '<t:' + Math.trunc(creation_date.getTime() / 1000) + ':R>';
 		}
 		var language = [lang.get('overview.lang'), body.query.languages.find( language => {
 			return language.code === body.query.general.lang;
@@ -64,7 +69,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 			
 			if ( body.query.rightsinfo.text ) {
 				let licensetext = body.query.rightsinfo.text;
-				if ( msg.showEmbed() ) {
+				if ( msg.showEmbed() && !noEmbed ) {
 					license[1] = '[' + toPlaintext(licensetext, true) + '](' + licenseurl + ')';
 				}
 				else license[1] = toPlaintext(licensetext, true) + ' (<' + licenseurl + '>)';
@@ -72,24 +77,29 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 			else license[1] = '<' + licenseurl + '>';
 		}
 		else if ( body.query.rightsinfo.text ) {
-			license[1] = toFormatting(body.query.rightsinfo.text, msg.showEmbed(), wiki, '', true);
+			license[1] = toFormatting(body.query.rightsinfo.text, ( msg.showEmbed() && !noEmbed ), wiki, '', true);
 		}
 		var misermode = [lang.get('overview.misermode'), lang.get('overview.' + ( body.query.general.misermode !== undefined ? 'yes' : 'no' ))];
 		var readonly = [lang.get('overview.readonly')];
 		if ( body.query.general.readonly !== undefined ) {
 			if ( body.query.general.readonlyreason ) {
 				let readonlyreason = body.query.general.readonlyreason;
-				readonly.push(toFormatting(readonlyreason, msg.showEmbed(), wiki, '', true));
+				readonly.push(toFormatting(readonlyreason, ( msg.showEmbed() && !noEmbed ), wiki, '', true));
 			}
 			else readonly = ['\u200b', '**' + lang.get('overview.readonly') + '**'];
 		}
 		
 		var title = body.query.pages['-1'].title;
-		var pagelink = wiki.toLink(title);
+		var pagelink = wiki.toLink(title, querystring, fragment);
 		var text = '<' + pagelink + '>';
 		var embed = null;
-		if ( msg.showEmbed() ) {
+		if ( msg.showEmbed() && !noEmbed ) {
 			embed = new MessageEmbed().setAuthor( body.query.general.sitename ).setTitle( escapeFormatting(title) ).setURL( pagelink ).setThumbnail( new URL(body.query.general.logo, wiki).href );
+			if ( body.query.allmessages?.[0]?.['*']?.trim?.() ) {
+				let displaytitle = escapeFormatting(body.query.allmessages[0]['*'].trim());
+				if ( displaytitle.length > 250 ) displaytitle = displaytitle.substring(0, 250) + '\u2026';
+				embed.setTitle( displaytitle );
+			}
 		}
 		else {
 			text += '\n';
@@ -106,11 +116,11 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 			var manager = [lang.get('overview.manager'), ''];
 			var founder = [lang.get('overview.founder')];
 			var crossover = [lang.get('overview.crossover')];
-			if ( body.query.allmessages?.[0]?.['*'] ) {
-				crossover[1] = '<https://' + body.query.allmessages[0]['*'] + '.gamepedia.com/>';
+			if ( body.query.allmessages?.[1]?.['*']?.trim?.() ) {
+				crossover[1] = '<https://' + body.query.allmessages[1]['*'].trim() + '.gamepedia.com/>';
 			}
-			if ( body.query.allmessages?.[1]?.['*'] ) {
-				let mergeNotice = body.query.allmessages[1]['*'];
+			if ( body.query.allmessages?.[2]?.['*']?.trim?.() ) {
+				let mergeNotice = body.query.allmessages[2]['*'].trim();
 				if ( !mergeNotice.includes( '|' ) ) {
 					mergeNotice = mergeNotice.split('/');
 					crossover[1] = '<https://' + mergeNotice[0] + '.fandom.com/' + ( mergeNotice[1] ? '/' + mergeNotice[1] : '' ) + '>';
@@ -132,6 +142,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 				if ( site.creation_date && creation_date > new Date(site.creation_date) ) {
 					creation_date = new Date(site.creation_date);
 					created[1] = dateformat.format(creation_date);
+					created[2] = '<t:' + Math.trunc(creation_date.getTime() / 1000) + ':R>';
 				}
 				if ( site.desc ) {
 					description[1] = escapeFormatting(site.desc);
@@ -151,7 +162,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 						}
 						else {
 							var user = usbody.query.users[0].name;
-							if ( msg.showEmbed() ) founder[1] = '[' + user + '](' + wiki.toLink('User:' + user, '', '', true) + ')';
+							if ( msg.showEmbed() && !noEmbed ) founder[1] = '[' + user + '](' + wiki.toLink('User:' + user, '', '', true) + ')';
 							else founder[1] = user;
 						}
 					}, error => {
@@ -183,13 +194,13 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 				console.log( '- Error while getting the wiki details: ' + error );
 				return;
 			} ).finally( () => {
-				if ( msg.showEmbed() ) {
+				if ( msg.showEmbed() && !noEmbed ) {
 					if ( vertical[1] ) embed.addField( vertical[0], vertical[1], true );
 					if ( topic[1] ) embed.addField( topic[0], topic[1], true );
 					if ( official[1] ) embed.addField( official[0], official[1], true );
 					embed.addField( version[0], version[1], true ).addField( language[0], language[1], true );
 					if ( rtl[1] ) embed.addField( rtl[0], rtl[1], true );
-					embed.addField( created[0], created[1], true ).addField( articles[0], articles[1], true ).addField( pages[0], pages[1], true ).addField( edits[0], edits[1], true );
+					embed.addField( created[0], created[1] + '\n' + created[2], true ).addField( articles[0], articles[1], true ).addField( pages[0], pages[1], true ).addField( edits[0], edits[1], true );
 					if ( posts[1] ) embed.addField( posts[0], posts[1], true );
 					if ( walls[1] ) embed.addField( walls[0], walls[1], true );
 					if ( comments[1] ) embed.addField( comments[0], comments[1], true );
@@ -218,23 +229,20 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 					if ( crossover[1] ) text += '\n' + crossover.join(' ');
 					text += '\n' + license.join(' ') + '\n' + misermode.join(' ');
 					if ( description[1] ) text += '\n' + description.join(' ');
-					if ( image[1] ) {
-						text += '\n' + image.join(' ');
-						if ( msg.uploadFiles() ) embed.files = [{attachment:image[1],name:( spoiler ? 'SPOILER ' : '' ) + body.query.general.sitename + image[1].substring(image[1].lastIndexOf('.'))}];
-					}
+					if ( image[1] ) text += '\n' + image.join(' ');
 					if ( readonly[1] ) text += '\n\n' + ( readonly[0] === '\u200b' ? readonly[1] : readonly.join('\n') );
 					text += '\n\n*' + lang.get('overview.inaccurate') + '*';
 				}
 				
-				msg.sendChannel( spoiler + text + spoiler, {embed} );
+				msg.sendChannel( {content: spoiler + text + spoiler, embeds: [embed]} );
 				
 				if ( reaction ) reaction.removeEmoji();
 			} );
 		}
-		if ( msg.showEmbed() ) {
+		if ( msg.showEmbed() && !noEmbed ) {
 			embed.addField( version[0], version[1], true ).addField( language[0], language[1], true );
 			if ( rtl[1] ) embed.addField( rtl[0], rtl[1], true );
-			embed.addField( created[0], created[1], true ).addField( articles[0], articles[1], true ).addField( pages[0], pages[1], true ).addField( edits[0], edits[1], true ).addField( users[0], users[1], true ).addField( admins[0], admins[1], true ).addField( license[0], license[1], true ).addField( misermode[0], misermode[1], true ).setFooter( lang.get('overview.inaccurate') );
+			embed.addField( created[0], created[1] + '\n' + created[2], true ).addField( articles[0], articles[1], true ).addField( pages[0], pages[1], true ).addField( edits[0], edits[1], true ).addField( users[0], users[1], true ).addField( admins[0], admins[1], true ).addField( license[0], license[1], true ).addField( misermode[0], misermode[1], true ).setFooter( lang.get('overview.inaccurate') );
 			if ( readonly[1] ) embed.addField( readonly[0], readonly[1] );
 		}
 		else {
@@ -245,7 +253,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 			text += '\n\n*' + lang.get('overview.inaccurate') + '*';
 		}
 		
-		msg.sendChannel( spoiler + text + spoiler, {embed} );
+		msg.sendChannel( {content: spoiler + text + spoiler, embeds: [embed]} );
 		
 		if ( reaction ) reaction.removeEmoji();
 	}, error => {
@@ -255,7 +263,7 @@ function gamepedia_overview(lang, msg, wiki, reaction, spoiler) {
 		}
 		else {
 			console.log( '- Error while getting the statistics: ' + error );
-			msg.sendChannelError( spoiler + '<' + wiki.toLink('Special:Statistics') + '>' + spoiler );
+			msg.sendChannelError( spoiler + '<' + wiki.toLink('Special:Statistics', querystring, fragment) + '>' + spoiler );
 		}
 		
 		if ( reaction ) reaction.removeEmoji();

@@ -1,3 +1,5 @@
+const {Util} = require('discord.js');
+const {got} = require('../../util/functions.js');
 const Wiki = require('../../util/wiki.js');
 const commands = require('./commands.json');
 
@@ -12,8 +14,9 @@ const commands = require('./commands.json');
  * @param {String} cmd - The command at this point.
  * @param {import('discord.js').MessageReaction} reaction - The reaction on the message.
  * @param {String} spoiler - If the response is in a spoiler.
+ * @param {Boolean} noEmbed - If the response should be without an embed.
  */
-function minecraft_syntax(lang, msg, wiki, mccmd, args, title, cmd, reaction, spoiler) {
+function minecraft_syntax(lang, msg, wiki, mccmd, args, title, cmd, reaction, spoiler, noEmbed) {
 	mccmd = mccmd.toLowerCase();
 	var aliasCmd = ( commands.aliases[mccmd] || mccmd );
 	var cmdpage = commands.wikis[wiki.href];
@@ -65,14 +68,14 @@ function minecraft_syntax(lang, msg, wiki, mccmd, args, title, cmd, reaction, sp
 		}, error => {
 			console.log( '- Error while getting the command page: ' + error );
 		} ).finally( () => {
-			msg.sendChannel( spoiler + '```md\n' + cmdSyntax + '```<' + wiki.toLink(( cmdpage.endsWith( '/' ) ? cmdpage + aliasCmd : cmdpage ), '', ( cmdpage.endsWith( '/' ) ? '' : aliasCmd )) + '>' + spoiler, {split:{maxLength:2000,prepend:spoiler + '```md\n',append:'```' + spoiler}} );
+			Util.splitMessage( spoiler + '```md\n' + cmdSyntax + '```<' + wiki.toLink(( cmdpage.endsWith( '/' ) ? cmdpage + aliasCmd : cmdpage ), '', ( cmdpage.endsWith( '/' ) ? '' : aliasCmd )) + '>' + spoiler, {maxLength: 2000, prepend: spoiler + '```md\n', append: '```' + spoiler} ).forEach( textpart => msg.sendChannel( textpart ) );
 
 			if ( reaction ) reaction.removeEmoji();
 		} );
 	}
 	else {
 		msg.notMinecraft = true;
-		this.WIKI.general(lang, msg, title, wiki, cmd, reaction, spoiler);
+		this.WIKI.general(lang, msg, title, wiki, cmd, reaction, spoiler, noEmbed);
 	}
 }
 

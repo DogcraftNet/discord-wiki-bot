@@ -2,7 +2,7 @@ const got = require('got').extend( {
 	throwHttpErrors: false,
 	timeout: 5000,
 	headers: {
-		'User-Agent': 'Wiki-Bot/' + ( isDebug ? 'testing' : process.env.npm_package_version ) + '/dashboard (Discord; ' + process.env.npm_package_name + ')'
+		'User-Agent': 'Wiki-Bot/' + ( isDebug ? 'testing' : process.env.npm_package_version ) + '/dashboard (Discord; ' + process.env.npm_package_name + ( process.env.invite ? '; ' + process.env.invite : '' ) + ')'
 	},
 	responseType: 'json'
 } );
@@ -17,6 +17,36 @@ const oauth = new DiscordOauth2( {
 	clientSecret: process.env.secret,
 	redirectUri: process.env.dashboard
 } );
+
+const {oauthSites} = require('../util/wiki.js');
+
+const enabledOAuth2 = [
+	...oauthSites.filter( oauthSite => {
+		let site = new URL(oauthSite);
+		site = site.hostname + site.pathname.slice(0, -1);
+		return ( process.env[`oauth_${site}`] && process.env[`oauth_${site}_secret`] );
+	} ).map( oauthSite => {
+		let site = new URL(oauthSite);
+		return {
+			id: site.hostname + site.pathname.slice(0, -1),
+			name: oauthSite, url: oauthSite,
+		};
+	} )
+];
+if ( process.env.oauth_miraheze && process.env.oauth_miraheze_secret ) {
+	enabledOAuth2.unshift({
+		id: 'miraheze',
+		name: 'Miraheze',
+		url: 'https://meta.miraheze.org/w/',
+	});
+}
+if ( process.env.oauth_wikimedia && process.env.oauth_wikimedia_secret ) {
+	enabledOAuth2.unshift({
+		id: 'wikimedia',
+		name: 'Wikimedia (Wikipedia)',
+		url: 'https://meta.wikimedia.org/w/',
+	});
+}
 
 const slashCommands = require('../interactions/commands.json');
 
@@ -110,9 +140,9 @@ const sessionData = new Map();
 const settingsData = new Map();
 
 /**
- * @type {Set<String>}
+ * @type {Map<String, String>}
  */
-const oauthVerify = new Set();
+const oauthVerify = new Map();
 
 /**
  * @type {Map<Number, PromiseConstructor>}
@@ -121,7 +151,7 @@ const messages = new Map();
 var messageId = 1;
 
 process.on( 'message', message => {
-	if ( message?.id === 'verifyUser' ) return oauthVerify.add(message.state);
+	if ( message?.id === 'verifyUser' ) return oauthVerify.set(message.state, message.user);
 	if ( message?.id ) {
 		if ( message.data.error ) messages.get(message.id).reject(message.data.error);
 		else messages.get(message.id).resolve(message.data.response);
@@ -160,13 +190,13 @@ if ( process.env.botlist ) {
 			link: 'https://bots.ondiscord.xyz/bots/' + process.env.bot,
 			widget: 'https://bots.ondiscord.xyz/bots/' + process.env.bot + '/embed?theme=dark&showGuilds=true'
 		},
-		'botsfordiscord.com': {
-			link: 'https://botsfordiscord.com/bots/' + process.env.bot,
-			widget: 'https://botsfordiscord.com/api/bot/' + process.env.bot + '/widget?theme=dark'
-		},
 		'discord.boats': {
 			link: 'https://discord.boats/bot/' + process.env.bot,
 			widget: 'https://discord.boats/api/widget/' + process.env.bot
+		},
+		'discords.com': {
+			link: 'https://discords.com/bots/bot/' + process.env.bot,
+			widget: 'https://discords.com/bots/api/bot/' + process.env.bot + '/widget?theme=dark'
 		},
 		'infinitybotlist.com': {
 			link: 'https://infinitybotlist.com/bots/' + process.env.bot,
@@ -271,6 +301,32 @@ function createNotice($, notice, dashboardLang, args = []) {
 			text.text(dashboardLang.get('notice.mwversion.text', false, args[0], args[1]));
 			note = $('<a target="_blank">').text('https://www.mediawiki.org/wiki/MediaWiki_1.30').attr('href', 'https://www.mediawiki.org/wiki/MediaWiki_1.30');
 			break;
+		case 'oauth':
+			type = 'success';
+			title.text(dashboardLang.get('notice.oauth.title'));
+			text.text(dashboardLang.get('notice.oauth.text'));
+			break;
+		case 'oauthfail':
+			type = 'error';
+			title.text(dashboardLang.get('notice.oauthfail.title'));
+			text.text(dashboardLang.get('notice.oauthfail.text'));
+			break;
+		case 'oauthverify':
+			type = 'success';
+			title.text(dashboardLang.get('notice.oauthverify.title'));
+			text.text(dashboardLang.get('notice.oauthverify.text'));
+			break;
+		case 'oauthother':
+			type = 'info';
+			title.text(dashboardLang.get('notice.oauthother.title'));
+			text.text(dashboardLang.get('notice.oauthother.text'));
+			note = $('<a>').text(dashboardLang.get('notice.oauthother.note')).attr('href', args[0]);
+			break;
+		case 'oauthlogin':
+			type = 'info';
+			title.text(dashboardLang.get('notice.oauthlogin.title'));
+			text.text(dashboardLang.get('notice.oauthlogin.text'));
+			break;
 		case 'nochange':
 			type = 'info';
 			title.text(dashboardLang.get('notice.nochange.title'));
@@ -290,7 +346,7 @@ function createNotice($, notice, dashboardLang, args = []) {
 			type = 'error';
 			title.text(dashboardLang.get('notice.noslash.title'));
 			text.text(dashboardLang.get('notice.noslash.text'));
-			note = $('<a target="_blank">').text(dashboardLang.get('notice.noslash.note')).attr('href', `https://discord.com/api/oauth2/authorize?client_id=${process.env.bot}&scope=applications.commands&guild_id=${args[0]}`);
+			note = $('<a target="_blank">').text(dashboardLang.get('notice.noslash.note')).attr('href', `https://discord.com/api/oauth2/authorize?client_id=${process.env.bot}&scope=applications.commands&guild_id=${args[0]}&disable_guild_select=true`);
 			break;
 		case 'wikiblocked':
 			type = 'error';
@@ -381,4 +437,4 @@ function hasPerm(all = 0, ...permission) {
 	} );
 }
 
-module.exports = {got, db, oauth, slashCommands, sessionData, settingsData, oauthVerify, sendMsg, addWidgets, createNotice, escapeText, hasPerm};
+module.exports = {got, db, oauth, enabledOAuth2, slashCommands, sessionData, settingsData, oauthVerify, sendMsg, addWidgets, createNotice, escapeText, hasPerm};

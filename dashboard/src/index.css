@@ -62,7 +62,7 @@ a[alt]:hover:after {
 	content: "";
 	display: block;
 	height: 48px;
-	margin: -48px 0 0;
+	margin-top: -48px;
 }
 #navbar a {
 	display: flex;
@@ -589,6 +589,9 @@ fieldset textarea {
 	height: 128px;
 	background: #32353b;
 }
+.theme-light #wb-settings-avatar-preview-img {
+	background-color: #fafafa;
+}
 .wb-settings-display:first-of-type,
 .wb-settings-permission:first-of-type {
 	display: inline-block;
@@ -605,6 +608,29 @@ button.addmore:not([hidden]) {
 }
 .wb-settings-optgroup {
 	font-weight: bold;
+}
+.wb-oauth-site {
+	margin-bottom: 30px;
+}
+.wb-oauth-site legend {
+	background-color: unset;
+	color: unset;
+}
+.wb-oauth-connected {
+	font-weight: bold;
+	color: green;
+}
+.wb-oauth-unconnected {
+	font-weight: bold;
+	color: red;
+}
+.wb-oauth-disabled {
+	font-weight: bold;
+	color: darkred;
+}
+.wb-oauth-enabled {
+	font-weight: bold;
+	color: darkgreen;
 }
 .wb-settings-error {
 	color: red;
