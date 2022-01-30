@@ -1,11 +1,11 @@
-const {MessageEmbed} = require('discord.js');
-const {got, escapeFormatting, limitLength} = require('../../util/functions.js');
+import { MessageEmbed } from 'discord.js';
+import { got, escapeFormatting, limitLength } from '../../util/functions.js';
 
 /**
  * Sends a Minecraft issue.
- * @param {import('../../util/i18n.js')} lang - The user language.
+ * @param {import('../../util/i18n.js').default} lang - The user language.
  * @param {import('discord.js').Message} msg - The Discord message.
- * @param {import('../../util/wiki.js')} wiki - The wiki.
+ * @param {import('../../util/wiki.js').default} wiki - The wiki.
  * @param {String[]} args - The command arguments.
  * @param {String} title - The page title.
  * @param {String} cmd - The command at this point.
@@ -51,7 +51,7 @@ function minecraft_bug(lang, msg, wiki, args, title, cmd, reaction, spoiler, noE
 					var description = parse_links( ( body.fields.description || '' ).replace( /\{code\}/g, '```' ) );
 					var embed = null;
 					if ( msg.showEmbed() && !noEmbed ) {
-						embed = new MessageEmbed().setAuthor( 'Mojira' ).setTitle( summary ).setURL( baseBrowseUrl + body.key ).setDescription( limitLength(description, 2000, 20) );
+						embed = new MessageEmbed().setAuthor( {name: 'Mojira'} ).setTitle( summary ).setURL( baseBrowseUrl + body.key ).setDescription( limitLength(description, 2000, 20) );
 						var links = body.fields.issuelinks.filter( link => link.outwardIssue || ( link.inwardIssue && link.type.name !== 'Duplicate' ) );
 						if ( links.length ) {
 							var linkList = lang.get('minecraft.issue_link');
@@ -65,7 +65,7 @@ function minecraft_bug(lang, msg, wiki, args, title, cmd, reaction, spoiler, noE
 								if ( embed.fields.length < 25 && ( embed.length + name.length + value.length ) < 6000 ) embed.addField( name, value );
 								else extralinks.push({name,value,inline:false});
 							} );
-							if ( extralinks.length ) embed.setFooter( lang.get('minecraft.more', extralinks.length.toLocaleString(lang.get('dateformat')), extralinks.length) );
+							if ( extralinks.length ) embed.setFooter( {text: lang.get('minecraft.more', extralinks.length.toLocaleString(lang.get('dateformat')), extralinks.length)} );
 						}
 					}
 					var status = ( body.fields.resolution ? body.fields.resolution.name : body.fields.status.name );
@@ -113,7 +113,7 @@ function minecraft_bug(lang, msg, wiki, args, title, cmd, reaction, spoiler, noE
 				else {
 					var embed = null;
 					if ( msg.showEmbed() && !noEmbed ) {
-						embed = new MessageEmbed().setAuthor( 'Mojira' ).setTitle( args.join(' ') ).setURL( uri );
+						embed = new MessageEmbed().setAuthor( {name: 'Mojira'} ).setTitle( args.join(' ') ).setURL( uri );
 						if ( body.total > 0 ) {
 							var statusList = lang.get('minecraft.status');
 							body.issues.forEach( bug => {
@@ -123,7 +123,7 @@ function minecraft_bug(lang, msg, wiki, args, title, cmd, reaction, spoiler, noE
 							} );
 							if ( body.total > 25 ) {
 								var extrabugs = body.total - 25;
-								embed.setFooter( lang.get('minecraft.more', extrabugs.toLocaleString(lang.get('dateformat')), extrabugs) );
+								embed.setFooter( {text: lang.get('minecraft.more', extrabugs.toLocaleString(lang.get('dateformat')), extrabugs)} );
 							}
 						}
 					}
@@ -158,7 +158,7 @@ function parse_links(text) {
 	return text;
 }
 
-module.exports = {
+export default {
 	name: 'bug',
 	run: minecraft_bug
 };

@@ -331,7 +331,7 @@
                 "desc": "如果我被啟動了，我就會回答你！否則不會。"
             },
             "user": {
-                "cmd": "User:<使用者名>",
+                "cmd": "User:<使用者名稱>",
                 "desc": "我將傳回指定使用者的資訊。"
             },
             "verification": {
@@ -492,7 +492,7 @@
         "add_more": "增加更多的近期變更webhook：",
         "added": "已新增一個近期變更webhook至：",
         "all_inactive": "wiki變更和討論版變更無法同時停用。",
-        "audit_reason": "“$1”的近期變更webhook",
+        "audit_reason": "「$1」的近期變更webhook",
         "audit_reason_delete": "已移除近期變更webhook",
         "audit_reason_edit": "近期變更 webhook 已更新",
         "avatar": "Webhook 頭像：",
@@ -558,7 +558,7 @@
                 "enabled_feeds": "• 已啟用討論版、留言牆和條目評論等基於推送頁的變更推送。",
                 "enabled_rc": "• 已啟用wiki變更。",
                 "lang": "• 已將語言變更為 $1。",
-                "name": "• 已將webhook的名稱變更為“$1”。",
+                "name": "• 已將webhook的名稱變更為「$1」。",
                 "updated": "此近期變更webhook已被變更：",
                 "wiki": "• wiki已被變更為 $1。"
             },
@@ -587,23 +587,25 @@
             "subcats": "$1 個分類"
         },
         "empty": "*此特殊頁面內容為空*",
-        "infopage": "結果不正確？使用 $1 來指定連接。",
+        "infopage": "結果不正確？使用 $1 來指定連結。",
         "infosearch": "結果不正確？使用 $1 來指定連結或使用 $2 列出所有結果。",
         "loading": "正在載入頁面描述……",
         "media": "到檔案描述頁",
+        "messagedefault": "預設：",
+        "messagedefaultnone": "*無*",
         "results": "共 $1 個結果",
         "special": "此特殊頁面的內容："
     },
     "settings": {
         "button": "使用控制台",
-        "channel current": "這是本頻道的當前設定：",
+        "channel current": "這是本頻道目前的設定：",
         "channel lang": "本頻道的語言為：",
         "channel langchanged": "您已將本頻道的語言變更為：",
         "channel role": "該頻道所需的最小身分組為：",
         "channel rolechanged": "您已將頻道所需的最小身分組改為：",
         "channel wiki": "本頻道的預設 wiki 是：",
         "channel wikichanged": "你已將本頻道的預設wiki變更為：",
-        "current": "這是本伺服器的當前設定：",
+        "current": "這是本伺服器目前的設定：",
         "currentchannel": "頻道複寫：",
         "currentinline": "行內指令：",
         "currentlang": "語言：",
@@ -617,11 +619,11 @@
         },
         "foundwikis": "你也許指的是這些 wiki？",
         "inline disabled": {
-            "channel inline": "行內指令目前已在本頻道禁用。",
-            "channel inlinechanged": "您禁用了本頻道的行內指令。",
+            "channel inline": "行內指令目前已在本頻道停用。",
+            "channel inlinechanged": "您停用了本頻道的行內指令。",
             "help": "使用 `$1` 啓用如 `[[$2]]` 和 `{{$2}}` 的行內指令。",
-            "inline": "行內指令目前已在本伺服器禁用。",
-            "inlinechanged": "您禁用了本伺服器的行內指令。"
+            "inline": "行內指令目前已在本伺服器停用。",
+            "inlinechanged": "您停用了本伺服器的行內指令。"
         },
         "inline enabled": {
             "channel inline": "目前本頻道已啟用行內指令。",
@@ -658,6 +660,7 @@
         "MediaWiki": "至少需要 $1 才能發揮全部功能，但只有`$2`。",
         "notice": "功能受限",
         "pause": "我在此伺服器正處於暫停狀態。",
+        "slow": "抱歉，我現在好像有點慢喔。",
         "text": [
             "全功率運行中！",
             " ",
@@ -690,7 +693,7 @@
             " ",
             " "
         ],
-        "time": "咋瓦魯多"
+        "time": "回應時間"
     },
     "user": {
         "block": {
@@ -736,7 +739,7 @@
     "verification": {
         "accountage": "註冊時長：",
         "add_more": "添加更多驗證方式：",
-        "added": "驗證方式已保存：",
+        "added": "驗證方式已儲存：",
         "and": "和",
         "channel": "頻道：",
         "channel_max": "提供的頻道過多。",
@@ -784,17 +787,17 @@
         "role_none": "無",
         "role_remove": "移除的身分組：",
         "role_too_high": "**$1 身分組的權重過高，$2 無法添加！**",
-        "save_failed": "抱歉，無法保存驗證方式，請稍後再試。",
+        "save_failed": "抱歉，無法儲存驗證方式，請稍後再試。",
         "success": "成功提示：",
         "toggle": "（開/關）",
         "updated": "驗證方式已更新：",
         "usergroup": "使用者組：",
         "usergroup_max": "提供的使用者組過多。",
-        "usergroup_too_long": "提供的使用者組過長。",
+        "usergroup_too_long": "提供的使用者群組過長。",
         "value_too_high": "提供的數量過高。"
     },
     "verify": {
-        "audit_reason": "已以“$1”的身份驗證",
+        "audit_reason": "已以「$1」的身份驗證",
         "button_again": "再次檢查",
         "button_wrong_user": "您不可以再次檢查此驗證，此驗證用於$1的驗證！",
         "discord": "Discord 使用者：",
@@ -807,7 +810,7 @@
         "footer": "Wiki 帳號驗證",
         "help_fandom": "https://community.fandom.com/zh/wiki/Special:VerifyUser",
         "help_gamepedia": "https://help.fandom.com/zh/wiki/Gamepedia帮助Wiki:Discord验证",
-        "help_guide": "請根據[此指導]($1)來添加您的 Discord 使用者名至您的 wiki 資料頁：",
+        "help_guide": "請根據[此指導]($1)來添加您的 Discord 使用者名稱至您的 wiki 資料頁：",
         "help_missing": "請確保您使用的是自己的wiki使用者名稱且大小寫正確。",
         "help_subpage": "請將您的Discord tag（$1）加至wiki上您的Discord子頁面：",
         "missing": "本頻道無可用的驗證方式。",
@@ -822,17 +825,17 @@
         "qualified_remove": "移除：",
         "qualified_remove_error": "無法移除：",
         "user_blocked": "**Wiki 使用者 $1 已被封鎖！**",
-        "user_blocked_reply": "您連接的 wiki 使用者**“$1”已被封鎖！**",
+        "user_blocked_reply": "您連接的 wiki 使用者**「$1」已被封鎖！**",
         "user_disabled": "**Wiki 使用者 $1 已被停用！**",
-        "user_disabled_reply": "您連接的 wiki 使用者**“$1”已被停用！**",
+        "user_disabled_reply": "您連接的 wiki 使用者**「$1」已被停用！**",
         "user_failed": "Discord 使用者 $1 不和 wiki 使用者 $2 對應。",
-        "user_failed_reply": "您的 Discord 使用者名不和“$1”的對應。",
+        "user_failed_reply": "您的 Discord 使用者名稱不和「$1」的對應。",
         "user_gblocked": "**Wiki 使用者 $1 已被全域封鎖！**",
-        "user_gblocked_reply": "您連接的 wiki 使用者**“$1”已被全域封鎖！**",
+        "user_gblocked_reply": "您連接的 wiki 使用者**「$1」已被全域封鎖！**",
         "user_matches": "Discord 使用者 $1 和 wiki 使用者 $2 對應，但沒有達到任何身分組的條件。",
-        "user_matches_reply": "您的 Discord 使用者名和 wiki 使用者“$1”對應，但您沒有達到添加任何身分組的條件。",
-        "user_missing": "Wiki 使用者“$1”不存在。",
-        "user_missing_reply": "您連接的 wiki 使用者“$1”不存在。",
+        "user_matches_reply": "您的 Discord 使用者名稱和 wiki 使用者「$1」對應，但您沒有達到添加任何身分組的條件。",
+        "user_missing": "Wiki 使用者「$1」不存在。",
+        "user_missing_reply": "您連接的 wiki 使用者「$1」不存在。",
         "user_renamed": "已將使用者的Discord暱稱變更為其wiki使用者名稱。",
         "user_verified": "Discord使用者 $1 已成功以wiki使用者 $2 的身分通過驗證。",
         "user_verified_reply": "您已成功以wiki使用者 $1 的身分通過驗證。",
@@ -841,11 +844,11 @@
     "voice": {
         "channel": "語音頻道",
         "disable": "使用 `$1` 禁用本功能。",
-        "disabled": "您禁用了給予每個在這個語音頻道的使用者一個特定的身分組的功能。",
+        "disabled": "您停用了給予每個在這個語音頻道的使用者一個特定的身分組的功能。",
         "enable": "使用 `$1` 啓用本功能。",
-        "enabled": "您啓用了給予每個在這個語音頻道的使用者一個特定的身分組的功能。",
-        "join": "$1 加入了語音頻道“$2”。",
-        "left": "$1 離開了語音頻道“$2”。",
+        "enabled": "您啟用了給予每個在這個語音頻道的使用者一個特定的身分組的功能。",
+        "join": "$1 加入了語音頻道「$2」。",
+        "left": "$1 離開了語音頻道「$2」。",
         "name": "語音頻道名",
         "text": "我將嘗試給予每個在這個語音頻道的使用者一個特定的身分組："
     }
