@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
   app:
-    image: node:15
+    image: node:16
     restart: always
     ports:
       - "127.0.0.1:8080:8080"
