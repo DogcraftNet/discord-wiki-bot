@@ -103,10 +103,10 @@ export default function newMessage(msg, lang, wiki = defaultSettings.wiki, prefi
 			else invokeWiki = 'https://' + invoke.substring(2) + '.wikia.org/';
 			return cmdmap.LINK(lang, msg, args.join(' '), new Wiki(invokeWiki), invoke + ' ');
 		}
-		if ( invoke.startsWith( '!!' ) && /^!!(?:[a-z\d-]{1,50}\.)?[a-z\d-]{1,50}\.[a-z\d-]{1,10}(?:\/|$)/.test(domainToASCII(invoke)) ) {
+		if ( invoke.startsWith( '!!' ) && /^!!(?:[a-z\d-]{1,50}\.)?(?:[a-z\d-]{1,50}\.)?[a-z\d-]{1,50}\.[a-z\d-]{1,10}$/.test(domainToASCII(invoke.split('/')[0])) ) {
 			let project = wikiProjects.find( project => invoke.split('/')[0].endsWith( project.name ) );
 			if ( project ) {
-				let regex = invoke.match( new RegExp( project.regex ) );
+				let regex = invoke.match( new RegExp( '^!!' + project.regex + '$' ) );
 				if ( regex && invoke === '!!' + regex[1] ) return cmdmap.LINK(lang, msg, args.join(' '), new Wiki('https://' + regex[1] + project.scriptPath), invoke + ' ');
 			}
 		}

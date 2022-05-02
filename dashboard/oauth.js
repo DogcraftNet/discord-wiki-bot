@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
-import cheerio from 'cheerio';
+import { load as cheerioLoad } from 'cheerio';
 import Wiki from '../util/wiki.js';
 import { allLangs } from './i18n.js';
 import { got, db, oauth, enabledOAuth2, sessionData, settingsData, oauthVerify, sendMsg, addWidgets, createNotice, hasPerm } from './util.js';
@@ -27,7 +27,7 @@ function dashboard_login(res, dashboardLang, theme, state, action) {
 		}
 		sessionData.delete(state);
 	}
-	var $ = cheerio.load(file);
+	var $ = cheerioLoad(file);
 	$('html').attr('lang', dashboardLang.lang);
 	if ( theme === 'light' ) $('html').addClass('theme-light');
 	$('<script>').text(`
@@ -164,7 +164,7 @@ function dashboard_oauth(res, state, searchParams, lastGuild) {
 				let returnLocation = '/';
 				if ( lastGuild ) {
 					if ( lastGuild === 'user' ) returnLocation += lastGuild;
-					else if ( /^\d+\/(?:settings|verification|rcscript|slash)(?:\/(?:\d+|new|notice))?$/.test(lastGuild) ) returnLocation += 'guild/' + lastGuild;
+					else if ( /^\d+\/(?:settings|verification|rcscript)(?:\/(?:\d+|new|notice))?$/.test(lastGuild) ) returnLocation += 'guild/' + lastGuild;
 				}
 				res.writeHead(302, {
 					Location: returnLocation,
@@ -255,14 +255,24 @@ function dashboard_api(res, input) {
 		api: true,
 		error: false,
 		error_code: '',
-		wiki: wiki.href,
+		wiki: wiki?.href,
 		base: '',
 		sitename: '',
 		logo: '',
 		MediaWiki: false,
 		RcGcDw: '',
-		customRcGcDw: wiki.toLink('MediaWiki:Custom-RcGcDw', 'action=edit')
+		customRcGcDw: wiki?.toLink('MediaWiki:Custom-RcGcDw', 'action=edit')
 	};
+	if ( !wiki ) {
+		result.error = true;
+		let body = JSON.stringify(result);
+		res.writeHead(200, {
+			'Content-Length': Buffer.byteLength(body),
+			'Content-Type': 'application/json'
+		});
+		res.write( body );
+		return res.end();
+	}
 	return got.get( wiki + 'api.php?&action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw&amenableparser=true&siprop=general&format=json', {
 		responseType: 'text'
 	} ).then( response => {
@@ -271,7 +281,7 @@ function dashboard_api(res, input) {
 		}
 		catch (error) {
 			if ( response.statusCode === 404 && typeof response.body === 'string' ) {
-				let api = cheerio.load(response.body)('head link[rel="EditURI"]').prop('href');
+				let api = cheerioLoad(response.body)('head link[rel="EditURI"]').prop('href');
 				if ( api ) {
 					wiki = new Wiki(api.split('api.php?')[0], wiki);
 					return got.get( wiki + 'api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw&amenableparser=true&siprop=general&format=json' );

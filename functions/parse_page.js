@@ -1,4 +1,4 @@
-import cheerio from 'cheerio';
+import { load as cheerioLoad } from 'cheerio';
 import { MessageEmbed } from 'discord.js';
 import { toSection } from '../util/wiki.js';
 import { got, parse_infobox, htmlToPlain, htmlToDiscord, escapeFormatting, limitLength } from '../util/functions.js';
@@ -52,6 +52,7 @@ const removeClasses = [
 	'.noexcerpt',
 	'.sortkey',
 	'.mw-collapsible.mw-collapsed',
+	'.c-item-hoverbox__display',
 	'wb\\:sectionedit'
 ];
 
@@ -269,7 +270,7 @@ export default function parse_page(lang, msg, content, embed, wiki, reaction, {n
 				if ( displaytitle.length > 250 ) displaytitle = displaytitle.substring(0, 250) + '\u2026';
 				embed.setTitle( displaytitle );
 			}
-			var $ = cheerio.load(response.body.parse.text['*'].replace( /\n?<br(?: ?\/)?>\n?/g, '<br>' ));
+			var $ = cheerioLoad(response.body.parse.text['*'].replace( /\n?<br(?: ?\/)?>\n?/g, '<br>' ));
 			if ( embed.brokenInfobox && $('aside.portable-infobox').length ) {
 				let infobox = $('aside.portable-infobox');
 				embed.fields.forEach( field => {

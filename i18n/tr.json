@@ -393,12 +393,6 @@
         "pause": "**Şu an bu sunucuda duraklatılmış durumdayım!**\nSadece bu komutlar gerçekleştirilebilir:"
     },
     "interaction": {
-        "dashboard": {
-            "perm_allow": "İzin ver",
-            "perm_default": "Varsayılan",
-            "perm_deny": "Reddet",
-            "updated": "$1, `$2` eğik çizgi komutu yetkilerini güncelledi."
-        },
         "inline": "Bu komutu kullanmak için [[wikitext]] ile bir metin girin.",
         "nowiki": "Kullanılan viki mevcut değil!",
         "verify": "Discord hesabını viki hesabın ile doğrulamak ve hesabın ile uyumlu rolleri almak için viki kullanıcı adını sağlayarak bu komutu kullan."
@@ -591,6 +585,8 @@
         "infosearch": "Doğru sonucu alamadın mı? Doğrudan bir bağlantı için $1, tüm isabetlerin listesi için $2 kullan.",
         "loading": "Sayfa açıklaması yükleniyor…",
         "media": "Dosya açıklama sayfasına",
+        "messagedefault": "Varsayılan:",
+        "messagedefaultnone": "*hiç*",
         "results": "Toplam $1 sonuç",
         "special": "Bu özel sayfanın içeriği:"
     },

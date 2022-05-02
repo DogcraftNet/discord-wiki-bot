@@ -1,4 +1,4 @@
-import cheerio from 'cheerio';
+import { load as cheerioLoad } from 'cheerio';
 import Lang from '../util/i18n.js';
 import Wiki from '../util/wiki.js';
 import { got, db, sendMsg, createNotice, hasPerm } from './util.js';
@@ -66,7 +66,7 @@ const fieldset = {
 
 /**
  * Create a settings form
- * @param {import('cheerio').default} $ - The response body
+ * @param {import('cheerio').CheerioAPI} $ - The response body
  * @param {String} header - The form header
  * @param {import('./i18n.js').default} dashboardLang - The user language
  * @param {Object} settings - The current settings
@@ -197,7 +197,7 @@ function createForm($, header, dashboardLang, settings, guildChannels, allWikis)
 /**
  * Let a user change recent changes scripts
  * @param {import('http').ServerResponse} res - The server response
- * @param {import('cheerio').default} $ - The response body
+ * @param {import('cheerio').CheerioAPI} $ - The response body
  * @param {import('./util.js').Guild} guild - The current guild
  * @param {String[]} args - The url parts
  * @param {import('./i18n.js').default} dashboardLang - The user language
@@ -378,6 +378,7 @@ function update_rcscript(res, userSettings, guild, type, settings) {
 				return res(`/guild/${guild}/rcscript`, 'savefail');
 			}
 			var wiki = Wiki.fromInput(settings.wiki);
+			if ( !wiki ) return res(`/guild/${guild}/rcscript/new`, 'savefail');
 			return got.get( wiki + 'api.php?&action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw|recentchanges&amenableparser=true&siprop=general&titles=Special:RecentChanges&format=json', {
 				responseType: 'text'
 			} ).then( fresponse => {
@@ -386,7 +387,7 @@ function update_rcscript(res, userSettings, guild, type, settings) {
 				}
 				catch (error) {
 					if ( fresponse.statusCode === 404 && typeof fresponse.body === 'string' ) {
-						let api = cheerio.load(fresponse.body)('head link[rel="EditURI"]').prop('href');
+						let api = cheerioLoad(fresponse.body)('head link[rel="EditURI"]').prop('href');
 						if ( api ) {
 							wiki = new Wiki(api.split('api.php?')[0], wiki);
 							return got.get( wiki + 'api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw|recentchanges&amenableparser=true&siprop=general&titles=Special:RecentChanges&format=json' );
@@ -622,6 +623,7 @@ function update_rcscript(res, userSettings, guild, type, settings) {
 				if ( ( row.postid === '-1' ) !== !settings.feeds ) hasDiff = true;
 				if ( !hasDiff ) return res(`/guild/${guild}/rcscript/${type}`, 'save');
 				var wiki = Wiki.fromInput(settings.wiki);
+				if ( !wiki ) return res(`/guild/${guild}/rcscript/${type}`, 'savefail');
 				return got.get( wiki + 'api.php?&action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw&amenableparser=true&siprop=general&format=json', {
 					responseType: 'text'
 				} ).then( fresponse => {
@@ -630,7 +632,7 @@ function update_rcscript(res, userSettings, guild, type, settings) {
 					}
 					catch (error) {
 						if ( fresponse.statusCode === 404 && typeof fresponse.body === 'string' ) {
-							let api = cheerio.load(fresponse.body)('head link[rel="EditURI"]').prop('href');
+							let api = cheerioLoad(fresponse.body)('head link[rel="EditURI"]').prop('href');
 							if ( api ) {
 								wiki = new Wiki(api.split('api.php?')[0], wiki);
 								return got.get( wiki + 'api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-RcGcDw&amenableparser=true&siprop=general&format=json' );

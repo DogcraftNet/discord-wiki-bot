@@ -47,6 +47,7 @@ export default class Wiki extends URL {
 		}
 		this.articlepath = articlepath;
 		this.mainpage = '';
+		this.mainpageisdomainroot = false;
 		this.miraheze = this.hostname.endsWith( '.miraheze.org' );
 		this.wikimedia = wikimediaSites.includes( this.hostname.split('.').slice(-2).join('.') );
 		this.centralauth = ( ( this.isWikimedia() || this.isMiraheze() ) ? 'CentralAuth' : 'local' );
@@ -86,11 +87,12 @@ export default class Wiki extends URL {
 	 * @param {String} [siteinfo.gamepedia] - If the wiki is a Gamepedia wiki.
 	 * @returns {Wiki}
 	 */
-	updateWiki({servername, scriptpath, articlepath, mainpage, centralidlookupprovider, logo, gamepedia = 'false'}) {
+	updateWiki({servername, scriptpath, articlepath, mainpage, mainpageisdomainroot, centralidlookupprovider, logo, gamepedia = 'false'}) {
 		this.hostname = servername;
 		this.pathname = scriptpath + '/';
 		this.articlepath = articlepath;
 		this.mainpage = mainpage;
+		this.mainpageisdomainroot = ( mainpageisdomainroot !== undefined );
 		this.centralauth = centralidlookupprovider;
 		this.miraheze = /^(?:https?:)?\/\/static\.miraheze\.org\//.test(logo);
 		this.gamepedia = ( gamepedia === 'true' ? true : this.hostname.endsWith( '.gamepedia.com' ) );
@@ -176,7 +178,10 @@ export default class Wiki extends URL {
 	 */
 	toLink(title = '', querystring = '', fragment = '', isMarkdown = false) {
 		querystring = new URLSearchParams(querystring);
-		if ( !querystring.toString().length ) title = ( title || this.mainpage );
+		if ( !querystring.toString().length ) {
+			title = ( title || this.mainpage );
+			if ( this.mainpageisdomainroot && title === this.mainpage ) return this.origin + '/' + Wiki.toSection(fragment, true, this.spaceReplacement);
+		}
 		title = title.replace( / /g, this.spaceReplacement ).replace( /%/g, '%2525' );
 		let link = new URL(this.articleURL);
 		link.pathname = link.pathname.replace( '$1', title.replace( /\\/g, '%5C' ) );
@@ -255,6 +260,7 @@ export default class Wiki extends URL {
 				if ( !input.includes( '.' ) ) return new Wiki('https://' + input + '.fandom.com/');
 				else return new Wiki('https://' + input.split('.')[1] + '.fandom.com/' + input.split('.')[0] + '/');
 			}
+			return null;
 		}
 		catch {
 			return null;
@@ -282,7 +288,8 @@ export default class Wiki extends URL {
 			articlepath: this.articlepath,
 			articleURL: this.articleURL,
 			spaceReplacement: this.spaceReplacement,
-			mainpage: this.mainpage
+			mainpage: this.mainpage,
+			mainpageisdomainroot: this.mainpageisdomainroot,
 		}
 		return 'Wiki ' + inspect(wiki, opts);
 	}

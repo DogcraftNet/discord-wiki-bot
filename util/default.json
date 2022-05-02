@@ -101,68 +101,74 @@
 	},
 	"wikiProjects": [
 		{
+			"name": "fandom.com",
+			"regex": "(([a-z\\d-]{1,50})\\.fandom\\.com(?:/(?!wiki)([a-z-]{2,12}))?)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/"
+		},
+		{
 			"name": "wikipedia.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikipedia\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikipedia\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "mediawiki.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?mediawiki\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?mediawiki\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikimedia.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikimedia\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikimedia\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wiktionary.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wiktionary\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wiktionary\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikibooks.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikibooks\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikibooks\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikisource.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikisource\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikisource\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikidata.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikidata\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikidata\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikiversity.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikiversity\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikiversity\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikiquote.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikiquote\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikiquote\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikinews.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikinews\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikinews\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "wikivoyage.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)?(?:m\\.)?wikivoyage\\.org)",
+			"regex": "((?:([a-z\\d-]{1,50})\\.)?(?:m\\.)?wikivoyage\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
@@ -173,38 +179,44 @@
 			"scriptPath": "/w/"
 		},
 		{
+			"name": "wiki.gg",
+			"regex": "(([a-z\\d-]{1,50})\\.wiki\\.gg(?:/(?!wiki)([a-z-]{2,12}))?)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/"
+		},
+		{
 			"name": "miraheze.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)miraheze\\.org)",
+			"regex": "(([a-z\\d-]{1,50})\\.miraheze\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
 		{
 			"name": "paradoxwikis.com",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)paradoxwikis\\.com)",
+			"regex": "(([a-z\\d-]{1,50})\\.paradoxwikis\\.com)",
 			"articlePath": "/",
 			"scriptPath": "/"
 		},
 		{
 			"name": "runescape.wiki",
-			"regex": "((?:(?:classic|oldschool|pt|www)\\.)?runescape\\.wiki)",
+			"regex": "((?:(classic|oldschool|pt|www)\\.)?runescape\\.wiki)",
 			"articlePath": "/w/",
 			"scriptPath": "/"
 		},
 		{
 			"name": "wiki.biligame.com",
-			"regex": "(wiki\\.biligame\\.com(?:/[a-z\\d]{1,50}))",
+			"regex": "(wiki\\.biligame\\.com/([a-z\\d]{1,50}))",
 			"articlePath": "/",
 			"scriptPath": "/"
 		},
 		{
 			"name": "metapedia.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)metapedia\\.org)",
+			"regex": "(([a-z\\d-]{1,50})\\.metapedia\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/m/"
 		},
 		{
 			"name": "brickimedia.org",
-			"regex": "((?:[a-z\\d-]{1,50}\\.)brickimedia\\.org)",
+			"regex": "(([a-z\\d-]{1,50})\\.brickimedia\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
@@ -222,7 +234,7 @@
 		},
 		{
 			"name": "stardewvalleywiki.com",
-			"regex": "((?:[a-z-]{2,12}\\.)?stardewvalleywiki\\.com)",
+			"regex": "((?:([a-z-]{2,12})\\.)?stardewvalleywiki\\.com)",
 			"articlePath": "/",
 			"scriptPath": "/mediawiki/"
 		},
@@ -234,7 +246,7 @@
 		},
 		{
 			"name": "metin2.gameforge.com",
-			"regex": "([a-z]{2}-wiki\\.metin2\\.gameforge\\.com)",
+			"regex": "(([a-z]{2})-wiki\\.metin2\\.gameforge\\.com)",
 			"articlePath": "/index.php/",
 			"scriptPath": "/"
 		},
@@ -264,13 +276,13 @@
 		},
 		{
 			"name": "moegirl.org.cn",
-			"regex": "([a-z-]{2,12}\\.moegirl\\.org\\.cn)",
+			"regex": "(([a-z-]{2,12})\\.moegirl\\.org\\.cn)",
 			"articlePath": "/",
 			"scriptPath": "/"
 		},
 		{
 			"name": "wiki-aventurica.de",
-			"regex": "((?:[a-z-]{2,12}\\.)?wiki-aventurica\\.de)",
+			"regex": "((?:([a-z-]{2,12})\\.)?wiki-aventurica\\.de)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/de/"
 		},
@@ -323,8 +335,8 @@
 			"scriptPath": "/w/"
 		},
 		{
-			"name": "bulbapedia.bulbagarden.net",
-			"regex": "(bulbapedia\\.bulbagarden\\.net)",
+			"name": "bulbagarden.net",
+			"regex": "((bulbapedia|archives|bulbanews)\\.bulbagarden\\.net)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
@@ -414,7 +426,7 @@
 		},
 		{
 			"name": "splatoonwiki.org",
-			"regex": "((?:(?:fr|www)\\.)?splatoonwiki\\.org)",
+			"regex": "((?:(es|fr|www)\\.)?splatoonwiki\\.org)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
@@ -450,7 +462,7 @@
 		},
 		{
 			"name": "ssbwiki.com",
-			"regex": "((?:(?:es|www)\\.)?ssbwiki\\.com)",
+			"regex": "((?:(es|www)\\.)?ssbwiki\\.com)",
 			"articlePath": "/",
 			"scriptPath": "/"
 		},
@@ -498,7 +510,7 @@
 		},
 		{
 			"name": "wikibound.info",
-			"regex": "((?:(?:it|www)\\.)?wikibound\\.info)",
+			"regex": "((?:(it|www)\\.)?wikibound\\.info)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/w/"
 		},
@@ -641,6 +653,12 @@
 			"scriptPath": "/wiki/"
 		},
 		{
+			"name": "poewiki.net",
+			"regex": "((?:www\\.)?poewiki\\.net)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/w/"
+		},
+		{
 			"name": "wikihow.com",
 			"regex": "((?:www\\.)?wikihow\\.com)",
 			"articlePath": "/",
@@ -669,6 +687,60 @@
 			"regex": "(lakeus\\.xyz)",
 			"articlePath": "/wiki/",
 			"scriptPath": "/"
+		},
+		{
+			"name": "betawiki.net",
+			"regex": "((?:www\\.)?betawiki\\.net)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/"
+		},
+		{
+			"name": "destinypedia.com",
+			"regex": "((?:www\\.)?destinypedia\\.com)",
+			"articlePath": "/",
+			"scriptPath": "/"
+		},
+		{
+			"name": "grifkuba.net",
+			"regex": "((?:www\\.)?(?:(wiki)\\.)?grifkuba\\.net)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/w/"
+		},
+		{
+			"name": "wiki.teamfortress.com",
+			"regex": "(wiki\\.teamfortress\\.com)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/w/"
+		},
+		{
+			"name": "lain.wiki",
+			"regex": "((?:www\\.)?lain\\.wiki)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/"
+		},
+		{
+			"name": "khuxwiki.com",
+			"regex": "((?:www\\.)?khuxwiki\\.com)",
+			"articlePath": "/wiki/",
+			"scriptPath": "/w/"
+		},
+		{
+			"name": "khdatabase.com",
+			"regex": "((?:www\\.)?khdatabase\\.com)",
+			"articlePath": "/",
+			"scriptPath": "/"
+		},
+		{
+			"name": "wiki.halo.fr",
+			"regex": "(wiki\\.halo\\.fr)",
+			"articlePath": "/",
+			"scriptPath": "/"
+		},
+		{
+			"name": "glitchtale.com",
+			"regex": "((?:www\\.)?glitchtale\\.com)",
+			"articlePath": "/wiki/index.php/",
+			"scriptPath": "/wiki/"
 		}
 	]
 }

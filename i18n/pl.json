@@ -393,12 +393,6 @@
         "pause": "**Moja praca na tym serwerze została wstrzymana!**\nTylko następujące komendy mogą być używane:"
     },
     "interaction": {
-        "dashboard": {
-            "perm_allow": "Zezwalaj",
-            "perm_default": "Domyślne",
-            "perm_deny": "Zabraniaj",
-            "updated": "$1 zaktualizował zezwolenia specjalne komendy po ukośniku dla `$2`."
-        },
         "inline": "Wyślij wiadomość z linkami [[wikitekstu]] aby użyć tej komendy.",
         "nowiki": "Używana wiki nie istnieje!",
         "verify": "Podaj swoją nazwę użytkownika na wiki aby użyć komendy do zweryfikowania swojego konta na Discordzie kontem na wiki oraz otrzymać role odpowiadające Twojemu koncie na wiki."
@@ -658,6 +652,7 @@
         "MediaWiki": "Wymaga przynajmniej $1 dla pełnej funkcjonalności, znaleziono `$2`.",
         "notice": "Niepełna funkcjonalność",
         "pause": "Moje działanie jest obecnie wstrzymane na tym serwerze.",
+        "slow": "Przepraszam, jestem trochę powolny w tej chwili :(",
         "text": [
             "Jestem w pełni funkcjonalny!",
             "Wciąż tu jestem!",
